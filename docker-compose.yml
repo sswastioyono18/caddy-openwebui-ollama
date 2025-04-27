@@ -12,12 +12,12 @@ services:
     networks:
       - ollama-net
 
-  server:
+  ollama-reverse-proxy:
     build:
       context: .
       dockerfile: Dockerfile
     image: bartolli497/xcaddy-auth:ollama
-    container_name: ollama-auth-server
+    container_name: ollama-reverse-proxy-server
     ports:
       - "8081:8081"
     restart: unless-stopped
