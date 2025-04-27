@@ -1,0 +1,37 @@
+{
+    debug
+}
+
+:8081 {
+    # Add CORS headers
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Authorization, Origin, X-Requested-With, Content-Type, Accept"
+        Access-Control-Max-Age 3600
+    }
+
+    # Handle OPTIONS requests (preflight)
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+
+    # Forward auth to the local Python service
+    forward_auth /* localhost:9090 {
+        uri /validate
+        copy_headers Authorization
+    }
+
+    # If auth passes, proxy to host Ollama
+    reverse_proxy host.docker.internal:11434 {
+        header_up Host {upstream_hostport}
+        header_up Authorization {header.Authorization}  # Explicitly forward the Authorization header
+    }
+
+    # Detailed error responses
+    handle_errors {
+        header Content-Type application/json
+        respond `{"error": "{err.status_text}", "status_code": {err.status_code}}` {err.status_code}
+    }
+}
