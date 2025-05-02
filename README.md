@@ -23,3 +23,18 @@ For url, use `http://ollama-reverse-proxy:8081`
 Api key in `Caddy/valid_keys.conf`
 
 Save, all done!
+
+# Example how to call API
+```
+curl -X POST http://host:port/api/chat/completions -H "Authorization: Bearer <bearer from OpenWebUI" \
+-H "Content-Type: application/json" \
+-d '{
+      "model": "gemma3:4b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Tell me about Google"
+        }
+      ]
+    }'
+```
